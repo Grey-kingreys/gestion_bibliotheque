@@ -111,7 +111,9 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('dashboard')->with('success', "Compte créé avec succès ! Votre matricule est : {$login}");
+        // Redirection selon le rôle (nouveau utilisateur = toujours lecteur)
+        return redirect()->route('lecteur.catalogue')
+            ->with('success', "Compte créé avec succès ! Votre matricule est : {$login}");
     }
 
     /**
