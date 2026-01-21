@@ -52,7 +52,7 @@
                         <a href="{{ route('lecteur.catalogue') }}" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
                             Catalogue
                         </a>
-                        <a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+                        <a href="{{ route('lecteur.mes-emprunts') }}" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
                             Mes Emprunts
                         </a>
                     @endif
