@@ -131,13 +131,16 @@
                     <div class="flex flex-col items-end gap-3">
                         <span class="px-3 py-1 rounded-full text-sm font-medium
                             @if($emprunt->statut === 'en_attente') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
+                            @elseif($emprunt->statut === 'valide') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
                             @elseif($emprunt->statut === 'en_cours') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
-                            @elseif($emprunt->statut === 'rejeté') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
+                            @elseif($emprunt->statut === 'retourne') bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
                             @else bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
                             @endif">
                             @if($emprunt->statut === 'en_attente') 🕐 En attente
+                            @elseif($emprunt->statut === 'valide') ✅ Validé
                             @elseif($emprunt->statut === 'en_cours') 📖 En cours
-                            @elseif($emprunt->statut === 'rejeté') ❌ Rejeté
+                            @elseif($emprunt->statut === 'retourne') ✔️ Retourné
+                            @elseif($emprunt->statut === 'rejete') ❌ Rejeté
                             @else ⚠️ En retard
                             @endif
                         </span>

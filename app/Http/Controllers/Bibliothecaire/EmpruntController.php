@@ -16,18 +16,27 @@ class EmpruntController extends Controller
     {
         $query = Emprunt::with(['user', 'livre.auteurs']);
 
+        // Mettre à jour les statuts des emprunts en retard
+        $this->mettreAJourStatutsEnRetard();
+
         // Filtrer par statut
         if ($request->filled('statut')) {
-            if ($request->statut === 'en_attente') {
-                $query->enAttente();
-            } elseif ($request->statut === 'en_cours') {
-                $query->enCours();
-            } elseif ($request->statut === 'retourne') {
-                $query->retourne();
-            } elseif ($request->statut === 'en_retard') {
-                $query->enRetard();
-            } elseif ($request->statut === 'rejete') {
-                $query->rejete();
+            switch ($request->statut) {
+                case 'en_attente':
+                    $query->enAttente();
+                    break;
+                case 'en_cours':
+                    $query->enCours();
+                    break;
+                case 'retourne':
+                    $query->retourne();
+                    break;
+                case 'en_retard':
+                    $query->enRetard();
+                    break;
+                case 'rejete':
+                    $query->rejete();
+                    break;
             }
         }
 
@@ -51,24 +60,20 @@ class EmpruntController extends Controller
     public function valider(Emprunt $emprunt)
     {
         if ($emprunt->statut !== 'en_attente') {
-            return back()->withErrors(['emprunt' => 'Cet emprunt ne peut pas être validé']);
+            return back()->withErrors(['emprunt' => 'Cet emprunt ne peut pas être validé. Statut actuel : ' . $emprunt->statut]);
         }
 
         // Vérifier la disponibilité
         if (!$emprunt->livre->estDisponible()) {
-            return back()->withErrors(['emprunt' => 'Le livre n\'est plus disponible']);
+            return back()->withErrors(['emprunt' => 'Le livre n\'est plus disponible (exemplaires disponibles : ' . $emprunt->livre->nombre_disponibles . ')']);
         }
 
-        // Emprunter le livre
-        $emprunt->livre->emprunter();
+        // Utiliser la méthode du modèle pour valider
+        if ($emprunt->valider()) {
+            return back()->with('success', 'Emprunt validé avec succès ! Le livre a été marqué comme emprunté.');
+        }
 
-        // Mettre à jour l'emprunt
-        $emprunt->update([
-            'statut' => 'en_cours',
-            'date_emprunt' => Carbon::now(),
-        ]);
-
-        return back()->with('success', 'Emprunt validé avec succès !');
+        return back()->withErrors(['emprunt' => 'Impossible de valider cet emprunt']);
     }
 
     /**
@@ -77,13 +82,24 @@ class EmpruntController extends Controller
     public function retour(Emprunt $emprunt)
     {
         if (!in_array($emprunt->statut, ['en_cours', 'en_retard'])) {
-            return back()->withErrors(['emprunt' => 'Cet emprunt ne peut pas être retourné']);
+            return back()->withErrors(['emprunt' => 'Cet emprunt ne peut pas être retourné. Statut actuel : ' . $emprunt->statut]);
         }
 
-        // Marquer comme retourné
-        $emprunt->marquerCommeRetourne();
+        try {
+            // Marquer comme retourné
+            $emprunt->marquerCommeRetourne();
 
-        return back()->with('success', 'Retour validé avec succès !');
+            $message = 'Retour validé avec succès !';
+            
+            // Informer s'il y a eu une pénalité
+            if ($emprunt->penalite) {
+                $message .= ' Une pénalité de ' . $emprunt->penalite->montant_formate . ' a été créée pour ' . $emprunt->penalite->jours_retard . ' jour(s) de retard.';
+            }
+
+            return back()->with('success', $message);
+        } catch (\Exception $e) {
+            return back()->withErrors(['emprunt' => 'Erreur lors du retour : ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -92,18 +108,48 @@ class EmpruntController extends Controller
     public function rejeter(Request $request, Emprunt $emprunt)
     {
         if ($emprunt->statut !== 'en_attente') {
-            return back()->withErrors(['emprunt' => 'Cette demande ne peut pas être rejetée']);
+            return back()->withErrors(['emprunt' => 'Cette demande ne peut pas être rejetée. Statut actuel : ' . $emprunt->statut]);
         }
 
         $request->validate([
             'motif' => 'required|string|max:500',
+        ], [
+            'motif.required' => 'Le motif du rejet est obligatoire',
+            'motif.max' => 'Le motif ne peut pas dépasser 500 caractères',
         ]);
 
-        $emprunt->update([
-            'statut' => 'rejete',
-            'commentaire' => $request->motif,
-        ]);
+        $emprunt->rejeter($request->motif);
 
-        return back()->with('success', 'Demande rejetée');
+        return back()->with('success', 'Demande rejetée avec succès');
+    }
+
+    /**
+     * Mettre à jour automatiquement les statuts des emprunts en retard
+     */
+    private function mettreAJourStatutsEnRetard(): void
+    {
+        // Récupérer tous les emprunts en cours qui sont en retard
+        $empruntsEnRetard = Emprunt::where('statut', 'en_cours')
+            ->whereDate('date_retour_prevue', '<', Carbon::now())
+            ->whereNull('date_retour_effective')
+            ->get();
+
+        // Mettre à jour leur statut
+        foreach ($empruntsEnRetard as $emprunt) {
+            $emprunt->update(['statut' => 'en_retard']);
+        }
+    }
+
+    /**
+     * Afficher les détails d'un emprunt
+     */
+    public function show(Emprunt $emprunt)
+    {
+        $emprunt->load(['user', 'livre.auteurs', 'livre.categorie', 'penalite']);
+        
+        // Mettre à jour le statut si nécessaire
+        $emprunt->updateStatutSiNecessaire();
+        
+        return view('bibliothecaire.emprunts.show', compact('emprunt'));
     }
 }
