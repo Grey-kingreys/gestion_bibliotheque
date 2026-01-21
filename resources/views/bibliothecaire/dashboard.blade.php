@@ -124,7 +124,7 @@
                                     <p class="text-sm text-gray-600 dark:text-gray-400">{{ $emprunt->user->full_name }}</p>
                                     <p class="text-xs text-gray-500 dark:text-gray-500">{{ $emprunt->created_at->diffForHumans() }}</p>
                                 </div>
-                                <a href="#" class="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 text-sm font-medium">
+                                <a href="{{ route('bibliothecaire.emprunts.index') }}" class="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 text-sm font-medium">
                                     Traiter →
                                 </a>
                             </div>
@@ -179,7 +179,7 @@
                                         Retard: {{ $emprunt->joursDeRetard() }} jour(s)
                                     </p>
                                 </div>
-                                <a href="#" class="text-red-600 hover:text-red-700 dark:text-red-400 text-sm font-medium">
+                                <a href="{{ route('bibliothecaire.emprunts.index') }}" class="text-red-600 hover:text-red-700 dark:text-red-400 text-sm font-medium">
                                     Contacter →
                                 </a>
                             </div>
@@ -206,7 +206,7 @@
             </div>
         </a>
 
-        <a href="#" class="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition p-6 group">
+        <a href="{{ route('bibliothecaire.emprunts.index') }}" class="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition p-6 group">
             <div class="flex items-center">
                 <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-4">
                     <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -67,12 +67,14 @@ class Emprunt extends Model
 
     public function marquerCommeRetourne(): void
     {
+        $etaitEnRetard = $this->estEnRetard();
+
         $this->update([
             'date_retour_effective' => Carbon::now(),
             'statut' => 'retourne',
         ]);
 
-        if ($this->estEnRetard()) {
+        if ($etaitEnRetard) {
             Penalite::create([
                 'emprunt_id' => $this->id,
                 'montant' => $this->calculerPenalite(),
@@ -83,6 +85,7 @@ class Emprunt extends Model
 
         $this->livre->retourner();
     }
+
 
     public function scopeEnCours($query)
     {
@@ -98,8 +101,18 @@ class Emprunt extends Model
                      });
     }
 
+    public function scopeRetourne($query)
+    {
+        return $query->where('statut', 'retourne');
+    }
+
     public function scopeEnAttente($query)
     {
         return $query->where('statut', 'en_attente');
+    }
+    
+    public function scopeRejete($query)
+    {
+        return $query->where('statut', 'rejete');
     }
 }

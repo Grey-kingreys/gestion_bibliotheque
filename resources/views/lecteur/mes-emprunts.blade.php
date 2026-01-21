@@ -69,7 +69,7 @@
                 <option value="">Tous les statuts</option>
                 <option value="en_attente" {{ request('statut') === 'en_attente' ? 'selected' : '' }}>En attente</option>
                 <option value="en_cours" {{ request('statut') === 'en_cours' ? 'selected' : '' }}>En cours</option>
-                <option value="retourne" {{ request('statut') === 'retourne' ? 'selected' : '' }}>Retournés</option>
+                <option value="rejete" {{ request('statut') === 'rejete' ? 'selected' : '' }}>Rejeté</option>
                 <option value="en_retard" {{ request('statut') === 'en_retard' ? 'selected' : '' }}>En retard</option>
             </select>
             

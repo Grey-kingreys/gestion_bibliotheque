@@ -22,8 +22,12 @@ class EmpruntController extends Controller
                 $query->enAttente();
             } elseif ($request->statut === 'en_cours') {
                 $query->enCours();
+            } elseif ($request->statut === 'retourne') {
+                $query->retourne();
             } elseif ($request->statut === 'en_retard') {
                 $query->enRetard();
+            } elseif ($request->statut === 'rejete') {
+                $query->rejete();
             }
         }
 
@@ -33,7 +37,9 @@ class EmpruntController extends Controller
         $stats = [
             'en_attente' => Emprunt::enAttente()->count(),
             'en_cours' => Emprunt::enCours()->count(),
+            'retourne' => Emprunt::retourne()->count(),
             'en_retard' => Emprunt::enRetard()->count(),
+            'rejete' => Emprunt::rejete()->count(),
         ];
 
         return view('bibliothecaire.emprunts.index', compact('emprunts', 'stats'));
@@ -94,7 +100,7 @@ class EmpruntController extends Controller
         ]);
 
         $emprunt->update([
-            'statut' => 'retourne',
+            'statut' => 'rejete',
             'commentaire' => $request->motif,
         ]);
 

@@ -4,9 +4,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Lecteur\CatalogueController;
 use App\Http\Controllers\Lecteur\EmpruntController as LecteurEmpruntController;
+use App\Http\Controllers\Bibliothecaire\LivreController;
+use App\Http\Controllers\Bibliothecaire\CategorieController;
+use App\Http\Controllers\Bibliothecaire\AuteurController;
+use App\Http\Controllers\Bibliothecaire\EmpruntController as BiblioEmpruntController;
 
 // ==========================================
-// ROUTES PUBLIQUES (Catalogue accessible à tous)
+// ROUTES PUBLIQUES
 // ==========================================
 Route::get('/', function () {
     if (auth()->check()) {
@@ -26,7 +30,6 @@ Route::get('/', function () {
     return redirect()->route('catalogue');
 })->name('home');
 
-// Catalogue accessible à tous (même sans connexion)
 Route::get('/catalogue', [CatalogueController::class, 'index'])->name('catalogue');
 Route::get('/livres/{livre}', [CatalogueController::class, 'show'])->name('livres.show');
 
@@ -48,10 +51,7 @@ Route::post('/logout', [AuthController::class, 'logout'])
 // ROUTES LECTEUR
 // ==========================================
 Route::middleware(['auth', 'role:Rlecteur'])->prefix('lecteur')->name('lecteur.')->group(function () {
-    // Catalogue (vue lecteur avec bouton emprunter)
     Route::get('/catalogue', [CatalogueController::class, 'index'])->name('catalogue');
-    
-    // Emprunts
     Route::post('/livres/{livre}/emprunter', [LecteurEmpruntController::class, 'demander'])->name('emprunter');
     Route::get('/mes-emprunts', [LecteurEmpruntController::class, 'mesEmprunts'])->name('mes-emprunts');
 });
@@ -65,26 +65,36 @@ Route::middleware(['auth', 'role:Rbibliothecaire,Radmin'])->prefix('bibliothecai
         return view('bibliothecaire.dashboard');
     })->name('dashboard');
     
-    // TODO: Ajouter les routes pour la gestion des livres, catégories, auteurs, emprunts
+    // Gestion des livres
+    Route::resource('livres', LivreController::class);
+    Route::post('livres/{livre}/toggle-disponibilite', [LivreController::class, 'toggleDisponibilite'])->name('livres.toggle-disponibilite');
+    
+    // Gestion des catégories
+    Route::resource('categories', CategorieController::class);
+    
+    // Gestion des auteurs
+    Route::resource('auteurs', AuteurController::class);
+    
+    // Gestion des emprunts
+    Route::get('emprunts', [BiblioEmpruntController::class, 'index'])->name('emprunts.index');
+    Route::post('emprunts/{emprunt}/valider', [BiblioEmpruntController::class, 'valider'])->name('emprunts.valider');
+    Route::post('emprunts/{emprunt}/retour', [BiblioEmpruntController::class, 'retour'])->name('emprunts.retour');
+    Route::post('emprunts/{emprunt}/rejeter', [BiblioEmpruntController::class, 'rejeter'])->name('emprunts.rejeter');
 });
 
 // ==========================================
 // ROUTES ADMINISTRATEUR
 // ==========================================
 Route::middleware(['auth', 'role:Radmin'])->prefix('admin')->name('admin.')->group(function () {
-    // Dashboard
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');
-    
-    // TODO: Ajouter les routes pour la gestion des utilisateurs
 });
 
 // ==========================================
-// ROUTES COMMUNES (tous les utilisateurs authentifiés)
+// ROUTES COMMUNES
 // ==========================================
 Route::middleware('auth')->group(function () {
-    // Profil utilisateur
     Route::get('/profil', function () {
         return view('profil.show');
     })->name('profile');

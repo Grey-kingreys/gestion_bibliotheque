@@ -17,10 +17,9 @@ return new class extends Migration
             $table->date('date_retour_effective')->nullable();
             $table->enum('statut', [
                 'en_attente',
-                'valide',
                 'en_cours',
                 'retourne',
-                'en_retard'
+                'rejete',
             ])->default('en_attente');
             $table->text('commentaire')->nullable();
             $table->timestamps();
