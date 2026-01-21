@@ -14,7 +14,7 @@
 
     <!-- Filtres de recherche -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-        <form method="GET" action="{{ route('livres.catalogue') }}" class="space-y-4">
+        <form method="GET" action="{{ route('catalogue') }}" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <!-- Recherche par titre -->
                 <div>
@@ -85,7 +85,7 @@
                     🔍 Rechercher
                 </button>
                 <a 
-                    href="{{ route('livres.catalogue') }}"
+                    href="{{ route('catalogue') }}"
                     class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg font-medium transition"
                 >
                     ✖️ Réinitialiser
@@ -93,6 +93,35 @@
             </div>
         </form>
     </div>
+
+    <!-- Messages de succès/erreur -->
+    @if(session('success'))
+        <div class="mb-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+            <div class="flex items-start">
+                <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-sm text-green-700 dark:text-green-400">{{ session('success') }}</p>
+            </div>
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <div class="flex items-start">
+                <svg class="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <div class="flex-1">
+                    <ul class="text-sm text-red-700 dark:text-red-400 space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <!-- Liste des livres -->
     @if($livres->isEmpty())
@@ -164,17 +193,26 @@
                             >
                                 Détails
                             </a>
-                            @if(auth()->check() && auth()->user()->isLecteur() && $livre->estDisponible())
-                                <form method="POST" action="{{ route('lecteur.emprunter', $livre) }}" class="flex-1">
-                                    @csrf
-                                    <button 
-                                        type="submit"
-                                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
-                                    >
-                                        Emprunter
-                                    </button>
-                                </form>
-                            @endif
+                            @auth
+                                @if(auth()->user()->isLecteur() && $livre->estDisponible())
+                                    <form method="POST" action="{{ route('lecteur.emprunter', $livre) }}" class="flex-1">
+                                        @csrf
+                                        <button 
+                                            type="submit"
+                                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+                                        >
+                                            Emprunter
+                                        </button>
+                                    </form>
+                                @endif
+                            @else
+                                <a 
+                                    href="{{ route('login') }}"
+                                    class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium text-center transition"
+                                >
+                                    Connexion
+                                </a>
+                            @endauth
                         </div>
                     </div>
                 </div>

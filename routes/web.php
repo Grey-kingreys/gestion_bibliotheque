@@ -4,12 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Lecteur\CatalogueController;
 use App\Http\Controllers\Lecteur\EmpruntController as LecteurEmpruntController;
-use App\Http\Controllers\Bibliothecaire\LivreController;
-use App\Http\Controllers\Bibliothecaire\CategorieController;
-use App\Http\Controllers\Bibliothecaire\AuteurController;
-use App\Http\Controllers\Bibliothecaire\EmpruntController as BiblioEmpruntController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\StatistiqueController;
 
 // ==========================================
 // ROUTES PUBLIQUES (Catalogue accessible à tous)
@@ -71,21 +65,7 @@ Route::middleware(['auth', 'role:Rbibliothecaire,Radmin'])->prefix('bibliothecai
         return view('bibliothecaire.dashboard');
     })->name('dashboard');
     
-    // Gestion des livres
-    Route::resource('livres', LivreController::class);
-    Route::post('livres/{livre}/toggle', [LivreController::class, 'toggleDisponibilite'])->name('livres.toggle');
-    
-    // Gestion des catégories
-    Route::resource('categories', CategorieController::class);
-    
-    // Gestion des auteurs
-    Route::resource('auteurs', AuteurController::class);
-    
-    // Gestion des emprunts
-    Route::get('emprunts', [BiblioEmpruntController::class, 'index'])->name('emprunts.index');
-    Route::post('emprunts/{emprunt}/valider', [BiblioEmpruntController::class, 'valider'])->name('emprunts.valider');
-    Route::post('emprunts/{emprunt}/retour', [BiblioEmpruntController::class, 'retour'])->name('emprunts.retour');
-    Route::post('emprunts/{emprunt}/rejeter', [BiblioEmpruntController::class, 'rejeter'])->name('emprunts.rejeter');
+    // TODO: Ajouter les routes pour la gestion des livres, catégories, auteurs, emprunts
 });
 
 // ==========================================
@@ -93,10 +73,11 @@ Route::middleware(['auth', 'role:Rbibliothecaire,Radmin'])->prefix('bibliothecai
 // ==========================================
 Route::middleware(['auth', 'role:Radmin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
-    Route::get('/dashboard', [StatistiqueController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('dashboard');
     
-    // Gestion des utilisateurs
-    Route::resource('users', UserController::class);
+    // TODO: Ajouter les routes pour la gestion des utilisateurs
 });
 
 // ==========================================
