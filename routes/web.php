@@ -68,6 +68,7 @@ Route::middleware(['auth', 'role:Rbibliothecaire,Radmin'])->prefix('bibliothecai
     // Gestion des livres
     Route::resource('livres', LivreController::class);
     Route::post('livres/{livre}/toggle-disponibilite', [LivreController::class, 'toggleDisponibilite'])->name('livres.toggle-disponibilite');
+    Route::post('livres/{livre}/show', [LivreController::class, 'show'])->name('livres.show');
     
     // Gestion des catégories
     Route::resource('categories', CategorieController::class);
