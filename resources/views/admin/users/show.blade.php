@@ -59,6 +59,7 @@
 
                     <!-- Boutons d'action -->
                     <div class="space-y-3">
+                        <!-- Modifier -->
                         <a 
                             href="{{ route('admin.users.edit', $user) }}"
                             class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition flex items-center justify-center"
@@ -69,16 +70,40 @@
                             Modifier
                         </a>
 
+                        <!-- Activer/Désactiver -->
                         <form method="POST" action="{{ route('admin.users.toggle-actif', $user) }}">
                             @csrf
                             <button 
                                 type="submit"
-                                class="w-full bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-medium transition flex items-center justify-center"
+                                class="w-full {{ $user->actif ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700' }} text-white px-6 py-3 rounded-lg font-medium transition flex items-center justify-center"
                             >
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                    @if($user->actif)
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                    @else
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    @endif
                                 </svg>
                                 {{ $user->actif ? 'Désactiver' : 'Activer' }}
+                            </button>
+                        </form>
+
+                        <!-- ✅ NOUVEAU : Supprimer définitivement -->
+                        <form 
+                            method="POST" 
+                            action="{{ route('admin.users.destroy', $user) }}"
+                            onsubmit="return confirm('⚠️ ATTENTION !\n\nCette action est IRRÉVERSIBLE !\n\nVoulez-vous vraiment SUPPRIMER DÉFINITIVEMENT cet utilisateur de la base de données ?\n\nToutes ses données seront perdues à jamais.\n\nTapez OUI pour confirmer.');"
+                        >
+                            @csrf
+                            @method('DELETE')
+                            <button 
+                                type="submit"
+                                class="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition flex items-center justify-center"
+                            >
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                                Supprimer définitivement
                             </button>
                         </form>
                     </div>
@@ -112,7 +137,7 @@
 
         <!-- Colonne droite - Activités -->
         <div class="lg:col-span-2 space-y-6">
-            <!-- Statistiques des emprunts -->
+            <!-- Statistiques des emprunts - ✅ AVEC REJETÉS -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                     <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,7 +146,7 @@
                     Statistiques d'emprunt
                 </h2>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
                         <p class="text-sm text-purple-600 dark:text-purple-400 mb-1">Total</p>
                         <p class="text-2xl font-bold text-purple-700 dark:text-purple-300">{{ $stats['total_emprunts'] }}</p>
@@ -140,6 +165,12 @@
                     <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
                         <p class="text-sm text-green-600 dark:text-green-400 mb-1">Retournés</p>
                         <p class="text-2xl font-bold text-green-700 dark:text-green-300">{{ $stats['retournes'] }}</p>
+                    </div>
+
+                    <!-- ✅ NOUVEAU : Statistique des rejetés -->
+                    <div class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
+                        <p class="text-sm text-orange-600 dark:text-orange-400 mb-1">Rejetés</p>
+                        <p class="text-2xl font-bold text-orange-700 dark:text-orange-300">{{ $stats['rejetes'] }}</p>
                     </div>
                 </div>
             </div>

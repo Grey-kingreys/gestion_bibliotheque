@@ -26,7 +26,7 @@
                         <a href="{{ route('admin.dashboard') }}" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
                             Tableau de bord
                         </a>
-                        <a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+                        <a href="{{ route('admin.users.index') }}" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
                             Utilisateurs
                         </a>
                         <a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 px-3 py-2 text-sm font-medium">

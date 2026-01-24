@@ -8,6 +8,7 @@ use App\Http\Controllers\Bibliothecaire\LivreController;
 use App\Http\Controllers\Bibliothecaire\CategorieController;
 use App\Http\Controllers\Bibliothecaire\AuteurController;
 use App\Http\Controllers\Bibliothecaire\EmpruntController as BiblioEmpruntController;
+use App\Http\Controllers\Admin\UserController;
 
 // ==========================================
 // ROUTES PUBLIQUES
@@ -68,7 +69,6 @@ Route::middleware(['auth', 'role:Rbibliothecaire,Radmin'])->prefix('bibliothecai
     // Gestion des livres
     Route::resource('livres', LivreController::class);
     Route::post('livres/{livre}/toggle-disponibilite', [LivreController::class, 'toggleDisponibilite'])->name('livres.toggle-disponibilite');
-    Route::post('livres/{livre}/show', [LivreController::class, 'show'])->name('livres.show');
     
     // Gestion des catégories
     Route::resource('categories', CategorieController::class);
@@ -84,12 +84,29 @@ Route::middleware(['auth', 'role:Rbibliothecaire,Radmin'])->prefix('bibliothecai
 });
 
 // ==========================================
-// ROUTES ADMINISTRATEUR
+// ROUTES ADMINISTRATEUR - GESTION COMPLÈTE
 // ==========================================
 Route::middleware(['auth', 'role:Radmin'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');
+    
+    // ===== GESTION DES UTILISATEURS =====
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::post('/users/{user}/toggle-actif', [UserController::class, 'toggleActif'])->name('users.toggle-actif');
+    
+    // ===== STATISTIQUES (à implémenter) =====
+    // Route::get('/statistiques', [StatistiqueController::class, 'index'])->name('statistiques.index');
+    
+    // ===== PARAMÈTRES (à implémenter) =====
+    // Route::get('/parametres', [ParametreController::class, 'index'])->name('parametres.index');
 });
 
 // ==========================================

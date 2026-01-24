@@ -80,7 +80,7 @@ class UserController extends Controller
                     ->numbers()
                     ->symbols()
             ],
-            'actif' => 'boolean',
+            'actif' => 'nullable|boolean', // ✅ AJOUT DE NULLABLE
         ], [
             'nom.required' => 'Le nom est obligatoire',
             'prenom.required' => 'Le prénom est obligatoire',
@@ -118,12 +118,13 @@ class UserController extends Controller
     {
         $user->load(['emprunts.livre.auteurs', 'emprunts.livre.categorie']);
 
-        // Statistiques de l'utilisateur
+        // Statistiques de l'utilisateur - AJOUT DE "REJETE"
         $stats = [
             'total_emprunts' => $user->emprunts->count(),
             'en_cours' => $user->emprunts->where('statut', 'en_cours')->count(),
             'en_retard' => $user->emprunts->filter(fn($e) => $e->estEnRetard())->count(),
             'retournes' => $user->emprunts->where('statut', 'retourne')->count(),
+            'rejetes' => $user->emprunts->where('statut', 'rejete')->count(), // ✅ AJOUTÉ
         ];
 
         return view('admin.users.show', compact('user', 'stats'));
@@ -156,7 +157,7 @@ class UserController extends Controller
                     ->numbers()
                     ->symbols()
             ],
-            'actif' => 'boolean',
+            'actif' => 'nullable|boolean', // ✅ AJOUT DE NULLABLE
         ], [
             'nom.required' => 'Le nom est obligatoire',
             'prenom.required' => 'Le prénom est obligatoire',
@@ -188,7 +189,7 @@ class UserController extends Controller
     }
 
     /**
-     * Activer/Désactiver un utilisateur
+     * Activer/Désactiver un utilisateur (soft delete)
      */
     public function toggleActif(User $user)
     {
@@ -215,7 +216,7 @@ class UserController extends Controller
     }
 
     /**
-     * Supprimer un utilisateur (soft delete via désactivation)
+     * ✅ NOUVEAU : Supprimer définitivement un utilisateur de la base de données
      */
     public function destroy(User $user)
     {
@@ -230,22 +231,32 @@ class UserController extends Controller
             }
         }
 
-        // Vérifier s'il y a des emprunts en cours
-        $empruntsEnCours = $user->emprunts()
-            ->whereIn('statut', ['en_cours', 'en_retard', 'en_attente'])
-            ->count();
-
-        if ($empruntsEnCours > 0) {
+        // Empêcher de se supprimer soi-même
+        if ($user->id === auth()->id()) {
             return back()->withErrors([
-                'user' => 'Impossible de supprimer cet utilisateur car il a des emprunts en cours'
+                'user' => 'Vous ne pouvez pas supprimer votre propre compte'
             ]);
         }
 
-        // Désactiver au lieu de supprimer
-        $user->update(['actif' => false]);
+        // Vérifier s'il y a des emprunts en cours ou en retard
+        $empruntsActifs = $user->emprunts()
+            ->whereIn('statut', ['en_cours', 'en_retard', 'en_attente'])
+            ->count();
+
+        if ($empruntsActifs > 0) {
+            return back()->withErrors([
+                'user' => "Impossible de supprimer cet utilisateur : il a {$empruntsActifs} emprunt(s) actif(s). Veuillez d'abord traiter ses emprunts."
+            ]);
+        }
+
+        // Sauvegarder le nom pour le message
+        $nomComplet = $user->full_name;
+
+        // SUPPRESSION DÉFINITIVE de la base de données
+        $user->delete();
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'Utilisateur supprimé avec succès');
+            ->with('success', "L'utilisateur {$nomComplet} a été définitivement supprimé de la base de données.");
     }
 
     /**
