@@ -1,0 +1,7 @@
+services:
+  app:
+    image: laravel-app
+    container_name: laravel-container
+    ports:
+      - "8080:80"
+    restart: unless-stopped

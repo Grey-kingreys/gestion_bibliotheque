@@ -225,6 +225,54 @@
                 </div>
             @endif
 
+
+
+                        <!-- Emprunts Rejeté -->
+            @if($user->emprunts->whereIn('statut', ['rejete'])->count() > 0)
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86A2 2 0 0021 17.34L12.93 4.64a2 2 0 00-3.46 0L3 17.34A2 2 0 005.07 19z"/>
+                        </svg>
+                        Emprunts rejetés
+                    </h2>
+
+                    <div class="space-y-4">
+                        @foreach($user->emprunts->whereIn('statut', ['rejete'])->sortByDesc('created_at') as $emprunt)
+                            <div class="flex items-start gap-4 p-4 bg-red-50 dark:bg-red-900/30 rounded-lg">
+                                <div class="w-16 h-20 bg-gradient-to-br from-red-500 to-orange-500 rounded flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-8 h-8 text-white opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86A2 2 0 0021 17.34L12.93 4.64a2 2 0 00-3.46 0L3 17.34A2 2 0 005.07 19z"/>
+                                    </svg>
+                                </div>
+
+                                <div class="flex-1">
+                                    <h4 class="font-medium text-gray-900 dark:text-white">{{ $emprunt->livre->titre }}</h4>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        {{ $emprunt->livre->auteurs->pluck('full_name')->implode(', ') }}
+                                    </p>
+                                    <div class="flex items-center gap-4 mt-2 text-xs">
+                                        <span class="text-gray-600 dark:text-gray-400">
+                                            Demandé le : {{ $emprunt->date_emprunt->format('d/m/Y') }}
+                                        </span>
+                                        <span class="text-gray-600 dark:text-gray-400">
+                                            Mis à jour le : {{ $emprunt->updated_at->format('d/m/Y') }}
+                                        </span>
+                                        <span class="text-gray-600 dark:text-gray-400">
+                                            Motif : {{ $emprunt->commentaire }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <span class="px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                    Rejeté
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
             <!-- Historique des emprunts -->
             @if($user->emprunts->where('statut', 'retourne')->count() > 0)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">

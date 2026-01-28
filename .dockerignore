@@ -1,6 +1,5 @@
 .git
 .gitignore
-.env
 .env.example
 .env.backup
 node_modules
