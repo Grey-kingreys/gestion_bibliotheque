@@ -32,7 +32,7 @@
                         <a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
                             Livres
                         </a>
-                        <a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+                        <a href="{{ route('admin.statistiques.index') }}" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
                             Statistiques
                         </a>
                     @elseif(auth()->user()->isBibliothecaire())

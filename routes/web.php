@@ -9,6 +9,7 @@ use App\Http\Controllers\Bibliothecaire\CategorieController;
 use App\Http\Controllers\Bibliothecaire\AuteurController;
 use App\Http\Controllers\Bibliothecaire\EmpruntController as BiblioEmpruntController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\StatistiqueController;
 
 // ==========================================
 // ROUTES PUBLIQUES
@@ -103,7 +104,7 @@ Route::middleware(['auth', 'role:Radmin'])->prefix('admin')->name('admin.')->gro
     Route::post('/users/{user}/toggle-actif', [UserController::class, 'toggleActif'])->name('users.toggle-actif');
     
     // ===== STATISTIQUES (à implémenter) =====
-    // Route::get('/statistiques', [StatistiqueController::class, 'index'])->name('statistiques.index');
+    Route::get('/statistiques', [StatistiqueController::class, 'index'])->name('statistiques.index');
     
     // ===== PARAMÈTRES (à implémenter) =====
     // Route::get('/parametres', [ParametreController::class, 'index'])->name('parametres.index');
