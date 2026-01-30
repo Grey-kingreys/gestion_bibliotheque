@@ -102,9 +102,13 @@ Route::middleware(['auth', 'role:Radmin'])->prefix('admin')->name('admin.')->gro
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     Route::post('/users/{user}/toggle-actif', [UserController::class, 'toggleActif'])->name('users.toggle-actif');
-    
-    // ===== STATISTIQUES (à implémenter) =====
+    // ============== STATISTIQUE   ==============
     Route::get('/statistiques', [StatistiqueController::class, 'index'])->name('statistiques.index');
+    // ============== LIVRES   ==============
+    Route::get('/livres', [LivreController::class, 'index'])->name('livres.index');
+
+    // ============== PENALITES   ==============
+    Route::get('/penalite', [PenaliteController::class, 'index'])->name('penalite.index');
     
     // ===== PARAMÈTRES (à implémenter) =====
     // Route::get('/parametres', [ParametreController::class, 'index'])->name('parametres.index');
