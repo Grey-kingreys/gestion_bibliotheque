@@ -17,3 +17,8 @@ docker-compose.yml
 *.log
 npm-debug.log
 yarn-error.log
+
+# ✅ AJOUTER CES LIGNES
+/public/storage
+/public/hot
+/public/build

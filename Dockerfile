@@ -32,7 +32,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Définir le répertoire de travail
 WORKDIR /code
 
-# Copier les fichiers du projet
+# Copier les fichiers du projet (SANS public/storage)
 COPY . .
 
 # Copier le script d'entrée personnalisé
@@ -42,12 +42,14 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 # Installer les dépendances PHP
 RUN composer install --no-interaction --optimize-autoloader
 
-# Installer les dépendances Node.js et compiler les assets
-RUN npm install && npm run build || true
+# ✅ NE PAS installer npm ici, c'est le conteneur Node qui le fait
 
 # Donner les permissions
 RUN chown -R www-data:www-data /code/storage /code/bootstrap/cache && \
     chmod -R 775 /code/storage /code/bootstrap/cache
+
+# ✅ Créer le répertoire public/storage
+RUN mkdir -p /code/public/storage
 
 EXPOSE 9000
 

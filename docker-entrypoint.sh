@@ -38,8 +38,9 @@ else
     echo "✅ Base de données déjà initialisée, pas de seed"
 fi
 
+# ✅ CRÉER LE LIEN SYMBOLIQUE STORAGE
 echo "🔗 Storage link..."
-php artisan storage:link
+php artisan storage:link --force
 
 echo "✅ Laravel prêt !"
 

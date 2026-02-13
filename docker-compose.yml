@@ -33,11 +33,11 @@ services:
     volumes:
       - ./:/code
     ports:
-      - "5173:5173"  # Port par défaut de Vite
+      - "5173:5173"  
     networks:
       - app-network
     environment:
-      - CHOKIDAR_USEPOLLING=1  # Important pour hot reload dans Docker
+      - CHOKIDAR_USEPOLLING=true  
       - VITE_HOST=0.0.0.0
 
 networks:
