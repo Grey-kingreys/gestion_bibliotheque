@@ -3,7 +3,7 @@ services:
   - type: web
     name: gestion-bibliotheque
     env: docker
-    dockerfilePath: ./Dockerfile.render
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: APP_NAME
         value: Gestion Bibliothèque
